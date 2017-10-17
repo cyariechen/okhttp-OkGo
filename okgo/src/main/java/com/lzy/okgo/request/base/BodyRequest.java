@@ -115,7 +115,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upString(String string) {
@@ -136,7 +138,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upJson(String json) {
@@ -145,7 +149,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upJson(JSONObject jsonObject) {
@@ -154,7 +160,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upJson(JSONArray jsonArray) {
@@ -163,7 +171,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upBytes(byte[] bs) {
@@ -172,7 +182,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upBytes(byte[] bs, MediaType mediaType) {
@@ -181,7 +193,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upFile(File file) {
@@ -190,7 +204,9 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         return (R) this;
     }
 
-    /** 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除 */
+    /**
+     * 注意使用该方法上传字符串会清空实体中其他所有的参数，头信息不清除
+     */
     @SuppressWarnings("unchecked")
     @Override
     public R upFile(File file, MediaType mediaType) {
@@ -201,12 +217,17 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
 
     @Override
     public RequestBody generateRequestBody() {
-        if (isSpliceUrl) url = HttpUtils.createUrlFromParams(baseUrl, params.urlParamsMap);
+        if (isSpliceUrl)
+            url = HttpUtils.createUrlFromParams(baseUrl, params.urlParamsMap);
 
-        if (requestBody != null) return requestBody;                                                //自定义的请求体
-        if (content != null && mediaType != null) return RequestBody.create(mediaType, content);    //上传字符串数据
-        if (bs != null && mediaType != null) return RequestBody.create(mediaType, bs);              //上传字节数组
-        if (file != null && mediaType != null) return RequestBody.create(mediaType, file);          //上传一个文件
+        if (requestBody != null)
+            return requestBody;                                                //自定义的请求体
+        if (content != null && mediaType != null)
+            return RequestBody.create(mediaType, content);    //上传字符串数据
+        if (bs != null && mediaType != null)
+            return RequestBody.create(mediaType, bs);              //上传字节数组
+        if (file != null && mediaType != null)
+            return RequestBody.create(mediaType, file);          //上传一个文件
         return HttpUtils.generateMultipartRequestBody(params, isMultipart);
     }
 
@@ -231,5 +252,33 @@ public abstract class BodyRequest<T, R extends BodyRequest> extends Request<T, R
         if (!TextUtils.isEmpty(mediaTypeString)) {
             mediaType = MediaType.parse(mediaTypeString);
         }
+    }
+
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public byte[] getBs() {
+        return bs;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public boolean isMultipart() {
+        return isMultipart;
+    }
+
+    public boolean isSpliceUrl() {
+        return isSpliceUrl;
+    }
+
+    public RequestBody getRequestBody() {
+        return requestBody;
     }
 }

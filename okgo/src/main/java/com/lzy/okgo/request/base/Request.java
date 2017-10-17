@@ -30,6 +30,7 @@ import com.lzy.okgo.convert.Converter;
 import com.lzy.okgo.model.HttpHeaders;
 import com.lzy.okgo.model.HttpMethod;
 import com.lzy.okgo.model.HttpParams;
+import com.lzy.okgo.model.JsonParams;
 import com.lzy.okgo.utils.HttpUtils;
 
 import java.io.IOException;
@@ -71,19 +72,25 @@ public abstract class Request<T, R extends Request> implements Serializable {
     protected transient CachePolicy<T> cachePolicy;
     protected transient ProgressRequestBody.UploadInterceptor uploadInterceptor;
 
+    protected JsonParams mJsonParams;
+
     public Request(String url) {
         this.url = url;
         baseUrl = url;
         OkGo go = OkGo.getInstance();
         //默认添加 Accept-Language
         String acceptLanguage = HttpHeaders.getAcceptLanguage();
-        if (!TextUtils.isEmpty(acceptLanguage)) headers(HttpHeaders.HEAD_KEY_ACCEPT_LANGUAGE, acceptLanguage);
+        if (!TextUtils.isEmpty(acceptLanguage))
+            headers(HttpHeaders.HEAD_KEY_ACCEPT_LANGUAGE, acceptLanguage);
         //默认添加 User-Agent
         String userAgent = HttpHeaders.getUserAgent();
-        if (!TextUtils.isEmpty(userAgent)) headers(HttpHeaders.HEAD_KEY_USER_AGENT, userAgent);
+        if (!TextUtils.isEmpty(userAgent))
+            headers(HttpHeaders.HEAD_KEY_USER_AGENT, userAgent);
         //添加公共请求参数
-        if (go.getCommonParams() != null) params(go.getCommonParams());
-        if (go.getCommonHeaders() != null) headers(go.getCommonHeaders());
+        if (go.getCommonParams() != null)
+            params(go.getCommonParams());
+        if (go.getCommonHeaders() != null)
+            headers(go.getCommonHeaders());
         //添加缓存模式
         retryCount = go.getRetryCount();
         cacheMode = go.getCacheMode();
@@ -98,7 +105,8 @@ public abstract class Request<T, R extends Request> implements Serializable {
 
     @SuppressWarnings("unchecked")
     public R retryCount(int retryCount) {
-        if (retryCount < 0) throw new IllegalArgumentException("retryCount must > 0");
+        if (retryCount < 0)
+            throw new IllegalArgumentException("retryCount must > 0");
         this.retryCount = retryCount;
         return (R) this;
     }
@@ -149,10 +157,13 @@ public abstract class Request<T, R extends Request> implements Serializable {
         return (R) this;
     }
 
-    /** 传入 -1 表示永久有效,默认值即为 -1 */
+    /**
+     * 传入 -1 表示永久有效,默认值即为 -1
+     */
     @SuppressWarnings("unchecked")
     public R cacheTime(long cacheTime) {
-        if (cacheTime <= -1) cacheTime = CacheEntity.CACHE_NEVER_EXPIRE;
+        if (cacheTime <= -1)
+            cacheTime = CacheEntity.CACHE_NEVER_EXPIRE;
         this.cacheTime = cacheTime;
         return (R) this;
     }
@@ -198,6 +209,13 @@ public abstract class Request<T, R extends Request> implements Serializable {
         params.put(key, value, isReplace);
         return (R) this;
     }
+
+    @SuppressWarnings("unchecked")
+    public R params(JsonParams jsonParams) {
+        this.mJsonParams = jsonParams;
+        return (R) this;
+    }
+
 
     @SuppressWarnings("unchecked")
     public R params(String key, int value, boolean... isReplace) {
@@ -259,17 +277,23 @@ public abstract class Request<T, R extends Request> implements Serializable {
         return (R) this;
     }
 
-    /** 默认返回第一个参数 */
+    /**
+     * 默认返回第一个参数
+     */
     public String getUrlParam(String key) {
         List<String> values = params.urlParamsMap.get(key);
-        if (values != null && values.size() > 0) return values.get(0);
+        if (values != null && values.size() > 0)
+            return values.get(0);
         return null;
     }
 
-    /** 默认返回第一个参数 */
+    /**
+     * 默认返回第一个参数
+     */
     public HttpParams.FileWrapper getFileParam(String key) {
         List<HttpParams.FileWrapper> values = params.fileParamsMap.get(key);
-        if (values != null && values.size() > 0) return values.get(0);
+        if (values != null && values.size() > 0)
+            return values.get(0);
         return null;
     }
 
@@ -305,6 +329,10 @@ public abstract class Request<T, R extends Request> implements Serializable {
         return cacheKey;
     }
 
+    public JsonParams getJsonParams() {
+        return mJsonParams;
+    }
+
     public long getCacheTime() {
         return cacheTime;
     }
@@ -323,20 +351,27 @@ public abstract class Request<T, R extends Request> implements Serializable {
 
     public Converter<T> getConverter() {
         // converter 优先级高于 callback
-        if (converter == null) converter = callback;
+        if (converter == null)
+            converter = callback;
         HttpUtils.checkNotNull(converter, "converter == null, do you forget to call Request#converter(Converter<T>) ?");
         return converter;
     }
 
     public abstract HttpMethod getMethod();
 
-    /** 根据不同的请求方式和参数，生成不同的RequestBody */
+    /**
+     * 根据不同的请求方式和参数，生成不同的RequestBody
+     */
     protected abstract RequestBody generateRequestBody();
 
-    /** 根据不同的请求方式，将RequestBody转换成Request对象 */
+    /**
+     * 根据不同的请求方式，将RequestBody转换成Request对象
+     */
     public abstract okhttp3.Request generateRequest(RequestBody requestBody);
 
-    /** 获取okhttp的同步call对象 */
+    /**
+     * 获取okhttp的同步call对象
+     */
     public okhttp3.Call getRawCall() {
         //构建请求体，返回call对象
         RequestBody requestBody = generateRequestBody();
@@ -347,11 +382,14 @@ public abstract class Request<T, R extends Request> implements Serializable {
         } else {
             mRequest = generateRequest(null);
         }
-        if (client == null) client = OkGo.getInstance().getOkHttpClient();
+        if (client == null)
+            client = OkGo.getInstance().getOkHttpClient();
         return client.newCall(mRequest);
     }
 
-    /** Rx支持，获取同步call对象 */
+    /**
+     * Rx支持，获取同步call对象
+     */
     public Call<T> adapt() {
         if (call == null) {
             return new CacheCall<>(this);
@@ -360,7 +398,9 @@ public abstract class Request<T, R extends Request> implements Serializable {
         }
     }
 
-    /** Rx支持,获取同步call对象 */
+    /**
+     * Rx支持,获取同步call对象
+     */
     public <E> E adapt(CallAdapter<T, E> adapter) {
         Call<T> innerCall = call;
         if (innerCall == null) {
@@ -369,7 +409,9 @@ public abstract class Request<T, R extends Request> implements Serializable {
         return adapter.adapt(innerCall, null);
     }
 
-    /** Rx支持,获取同步call对象 */
+    /**
+     * Rx支持,获取同步call对象
+     */
     public <E> E adapt(AdapterParam param, CallAdapter<T, E> adapter) {
         Call<T> innerCall = call;
         if (innerCall == null) {
@@ -378,12 +420,16 @@ public abstract class Request<T, R extends Request> implements Serializable {
         return adapter.adapt(innerCall, param);
     }
 
-    /** 普通调用，阻塞方法，同步请求执行 */
+    /**
+     * 普通调用，阻塞方法，同步请求执行
+     */
     public Response execute() throws IOException {
         return getRawCall().execute();
     }
 
-    /** 非阻塞方法，异步请求，但是回调在子线程中执行 */
+    /**
+     * 非阻塞方法，异步请求，但是回调在子线程中执行
+     */
     public void execute(Callback<T> callback) {
         HttpUtils.checkNotNull(callback, "callback == null");
 
